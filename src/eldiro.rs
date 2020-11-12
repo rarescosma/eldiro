@@ -51,21 +51,19 @@ impl Expr {
 }
 
 fn extract_digits(s: &str) -> (&str, &str) {
-    let digits_end = s
-        .char_indices()
-        .find_map(|(idx, c)| if c.is_ascii_digit() { None } else { Some(idx) })
-        .unwrap_or_else(|| s.len());
-
-    (&s[digits_end..], &s[..digits_end])
+    take_while(|c| c.is_ascii_digit(), s)
 }
 
 fn extract_whitespace(s: &str) -> (&str, &str) {
-    let whitespace_end = s
-        .char_indices()
-        .find_map(|(idx, c)| if c.is_whitespace() {None} else {Some(idx)})
-        .unwrap_or_else(|| s.len());
+    take_while(|c| c.is_whitespace(), s)
+}
 
-    (&s[whitespace_end..], &s[..whitespace_end])
+fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str) {
+    let take_end = s
+        .char_indices()
+        .find_map(|(idx, c)| if accept(c) {None} else {Some(idx)})
+        .unwrap_or_else(|| s.len());
+    (&s[take_end..], &s[..take_end])
 }
 
 fn extract_op(s: &str) -> (&str, &str) {
