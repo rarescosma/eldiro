@@ -200,4 +200,30 @@ mod tests {
             Ok(Val::Number(2)),
         );
     }
+
+    #[test]
+    fn eval_block_not_shadowing_parent_env_bindings() {
+        assert_eq!(
+            Block {
+                stmts: vec![
+                    Stmt::BindingDef(BindingDef {
+                        name: "foo".to_string(),
+                        val: Expr::Number(Number(17)),
+                    }),
+                    Stmt::Expr(Expr::Block(Block {
+                        stmts: vec![
+                            Stmt::BindingDef(BindingDef {
+                                name: "foo".to_string(),
+                                val: Expr::Number(Number(42)),
+                            }),
+                        ]
+                    })),
+                    Stmt::Expr(Expr::BindingUsage(BindingUsage {
+                        name: "foo".to_string()
+                    }))
+                ]
+            }.eval(&Env::default()),
+            Ok(Val::Number(17))
+        );
+    }
 }
