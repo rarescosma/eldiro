@@ -33,12 +33,12 @@ impl Block {
         }
 
         let mut child_env = env.create_child();
-        let mut res = Ok(Val::Unit);
 
-        for stmt in &self.stmts {
-            res = stmt.eval(&mut child_env);
+        let (tail, heads) = self.stmts.split_last().unwrap();
+        for stmt in heads {
+            stmt.eval(&mut child_env);
         }
-        res
+        tail.eval(&mut child_env)
     }
 }
 
