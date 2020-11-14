@@ -1,26 +1,26 @@
-pub mod block;
-pub mod binding_usage;
-
-use crate::utils;
-use crate::val::Val;
-use crate::env::Env;
-use crate::stmt::Stmt;
 use binding_usage::BindingUsage;
 use block::Block;
 
+use crate::env::Env;
+use crate::stmt::Stmt;
+use crate::utils;
+use crate::val::Val;
+
+mod binding_usage;
+mod block;
 
 #[derive(Debug, PartialEq)]
-pub struct Number(pub i32);
+pub(crate) struct Number(pub(crate) i32);
 
 impl Number {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    fn new(s: &str) -> Result<(&str, Self), String> {
         let (s, number) = utils::extract_digits(s)?;
         Ok((s, Self(number.parse().unwrap())))
     }
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Op {
+pub(crate) enum Op {
     Add,
     Sub,
     Mul,
@@ -28,7 +28,7 @@ pub enum Op {
 }
 
 impl Op {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    fn new(s: &str) -> Result<(&str, Self), String> {
         utils::tag("+", s)
             .map(|s| (s, Self::Add))
             .or_else(|_| utils::tag("-", s).map(|s| (s, Self::Sub)))
@@ -38,7 +38,7 @@ impl Op {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Expr {
+pub(crate) enum Expr {
     Number(Number),
     Operation { lhs: Number, rhs: Number, op: Op },
     BindingUsage(BindingUsage),
@@ -46,7 +46,7 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    pub(crate) fn new(s: &str) -> Result<(&str, Self), String> {
         Self::new_operation(s)
             .or_else(|_| Self::new_number(s))
             .or_else(|_| BindingUsage::new(s).map(|(s, binding_usage)| (s, Self::BindingUsage(binding_usage))))
@@ -91,9 +91,10 @@ impl Expr {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::stmt::Stmt;
     use crate::env::Env;
+    use crate::stmt::Stmt;
+
+    use super::*;
 
     #[test]
     fn parse_number() {

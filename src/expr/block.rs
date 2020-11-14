@@ -1,15 +1,15 @@
+use crate::env::Env;
 use crate::stmt::Stmt;
 use crate::utils;
 use crate::val::Val;
-use crate::env::Env;
 
 #[derive(Debug, PartialEq)]
-pub struct Block {
-    pub stmts: Vec<Stmt>
+pub(crate) struct Block {
+    pub(super) stmts: Vec<Stmt>
 }
 
 impl Block {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    pub(super) fn new(s: &str) -> Result<(&str, Self), String> {
         let s = utils::tag("{", s)?;
         let (s, _) = utils::extract_whitespace(s);
 
@@ -27,7 +27,7 @@ impl Block {
         Ok((s, Block { stmts }))
     }
 
-    pub(crate) fn eval(&self, env: &Env) -> Result<Val, String> {
+    pub(super) fn eval(&self, env: &Env) -> Result<Val, String> {
         if self.stmts.is_empty() {
             return Ok(Val::Unit)
         }
@@ -44,10 +44,10 @@ impl Block {
 
 #[cfg(test)]
 mod tests {
-    use super::super::{Expr, Number, BindingUsage, Op};
-    use super::*;
     use crate::binding_def::BindingDef;
 
+    use super::*;
+    use super::super::{BindingUsage, Expr, Number, Op};
 
     #[test]
     fn parse_empty_block() {
@@ -77,10 +77,10 @@ mod tests {
         assert_eq!(
             Block::new(
                 "{
-    let a = 10
-    let b = a
-    b
-}",
+                    let a = 10
+                    let b = a
+                    b
+                }"
             ),
             Ok((
                 "",

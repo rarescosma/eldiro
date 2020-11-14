@@ -4,13 +4,13 @@ use crate::expr::Expr;
 use crate::val::Val;
 
 #[derive(Debug, PartialEq)]
-pub enum Stmt {
+pub(crate) enum Stmt {
     BindingDef(BindingDef),
     Expr(Expr),
 }
 
 impl Stmt {
-    pub fn new(s: &str) -> Result<(&str, Self), String> {
+    pub(crate) fn new(s: &str) -> Result<(&str, Self), String> {
         BindingDef::new(s)
             .map(|(s, binding_def)| (s, Self::BindingDef(binding_def)))
             .or_else(|_| Expr::new(s).map(|(s, expr)| (s, Self::Expr(expr))))
@@ -19,15 +19,16 @@ impl Stmt {
     pub(crate) fn eval(&self, env: &mut Env) -> Result<Val, String> {
         match self {
             Stmt::BindingDef(bd) => bd.eval(env),
-            Stmt::Expr(ex) => ex.eval(env)
+            Stmt::Expr(ex) => ex.eval(env),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::expr::{Number, Op};
+
+    use super::*;
 
     #[test]
     fn parse_binding_def() {
