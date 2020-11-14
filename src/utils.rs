@@ -1,3 +1,5 @@
+const WHITESPACE: &[char] = &[' ', '\n'];
+
 pub(crate) fn extract_digits(s: &str) -> Result<(&str, &str), String> {
     take_while1(
         |c| c.is_ascii_digit(),
@@ -7,11 +9,11 @@ pub(crate) fn extract_digits(s: &str) -> Result<(&str, &str), String> {
 }
 
 pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
-    take_while(|c| c.is_whitespace(), s)
+    take_while(|c| WHITESPACE.contains(&c), s)
 }
 
 pub(crate) fn extract_whitespace1(s: &str) -> Result<(&str, &str), String> {
-    take_while1(|c| c.is_whitespace(), s, "expected a space".to_string())
+    take_while1(|c| WHITESPACE.contains(&c), s, "expected a space".to_string())
 }
 
 pub(crate) fn extract_ident(s: &str) -> Result<(&str, &str), String> {
@@ -103,6 +105,11 @@ mod tests {
     #[test]
     fn extract_spaces() {
         assert_eq!(extract_whitespace("    1"), ("1", "    "));
+    }
+
+    #[test]
+    fn extract_newlines_or_spaces() {
+        assert_eq!(extract_whitespace(" \n   \n\nabc"), ("abc", " \n   \n\n"));
     }
 
     #[test]
