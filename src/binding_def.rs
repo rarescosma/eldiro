@@ -1,5 +1,6 @@
 use crate::expr::Expr;
 use crate::utils;
+use crate::env::Env;
 
 #[derive(Debug, PartialEq)]
 pub struct BindingDef {
@@ -21,6 +22,10 @@ impl BindingDef {
         let (s, val) = Expr::new(s);
 
         (s, Self { name: name.to_string(), val })
+    }
+
+    pub(crate) fn eval(&self, env: &mut Env) {
+        env.store_binding(self.name.clone(), self.val.eval());
     }
 }
 
