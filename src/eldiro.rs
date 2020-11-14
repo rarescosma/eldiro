@@ -61,7 +61,9 @@ fn extract_whitespace(s: &str) -> (&str, &str) {
 fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str) {
     let take_end = s
         .char_indices()
-        .find_map(|(idx, c)| if accept(c) {None} else {Some(idx)})
+        .find_map(
+            |(idx, c)| if accept(c) { None } else { Some(idx) }
+        )
         .unwrap_or_else(|| s.len());
     (&s[take_end..], &s[..take_end])
 }
@@ -137,12 +139,18 @@ mod tests {
 
     #[test]
     fn extract_one_digit() {
-        assert_eq!(extract_digits("1+2"), ("+2", "1"));
+        assert_eq!(
+            extract_digits("1+2"),
+            ("+2", "1")
+        );
     }
 
     #[test]
     fn extract_multiple_digits() {
-        assert_eq!(extract_digits("10-20"), ("-20", "10"));
+        assert_eq!(
+            extract_digits("10-20"),
+            ("-20", "10")
+        );
     }
 
     #[test]
