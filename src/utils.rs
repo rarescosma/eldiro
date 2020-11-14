@@ -39,6 +39,24 @@ pub(crate) fn extract_op(s: &str) -> (&str, &str) {
     (&s[1..], &s[0..1])
 }
 
+/*
+Those lifetimes on tag might look scary,
+but all they’re doing is telling Rust that
+the lifetimes of s and the output are related,
+while the lifetimes of prefix and the output aren’t.
+
+If we didn’t have the lifetimes,
+Rust wouldn’t know if the returned value has to live
+as long as prefix, or s, or both.
+*/
+pub(crate) fn tag<'a, 'b>(prefix: &'a str, s: &'b str) -> &'b str {
+    if s.starts_with(prefix) {
+        &s[prefix.len()..]
+    } else {
+        panic!("expected {}", prefix)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -109,4 +127,8 @@ mod tests {
         assert_eq!(extract_ident("123abc"), ("123abc", ""));
     }
 
+    #[test]
+    fn tag_word() {
+        assert_eq!(tag("let", "let a"), " a")
+    }
 }
