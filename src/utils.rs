@@ -7,7 +7,17 @@ pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
 }
 
 pub(crate) fn extract_ident(s: &str) -> (&str, &str) {
-    take_while(|c| c.is_ascii_alphanumeric(), s)
+    let starts_with_alphabetic = s
+        .chars()
+        .next()
+        .map(|c| c.is_ascii_alphabetic())
+        .unwrap_or(false);
+
+    if starts_with_alphabetic {
+        take_while(|c| c.is_ascii_alphanumeric(), s)
+    } else {
+        (s, "")
+    }
 }
 
 pub(crate) fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str) {
@@ -93,4 +103,10 @@ mod tests {
     fn extract_alphanumeric_ident() {
         assert_eq!(extract_ident("bazbleh13()"), ("()", "bazbleh13"));
     }
+
+    #[test]
+    fn will_not_extract_ident_beginning_with_number() {
+        assert_eq!(extract_ident("123abc"), ("123abc", ""));
+    }
+
 }
