@@ -10,7 +10,11 @@ pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
     take_while(|c| c.is_whitespace(), s)
 }
 
-pub(crate) fn extract_ident(s: &str) -> (&str, &str) {
+pub(crate) fn extract_whitespace1(s: &str) -> Result<(&str, &str), String> {
+    take_while1(|c| c.is_whitespace(), s, "expected a space".to_string())
+}
+
+pub(crate) fn extract_ident(s: &str) -> Result<(&str, &str), String> {
     let starts_with_alphabetic = s
         .chars()
         .next()
@@ -18,9 +22,9 @@ pub(crate) fn extract_ident(s: &str) -> (&str, &str) {
         .unwrap_or(false);
 
     if starts_with_alphabetic {
-        take_while(|c| c.is_ascii_alphanumeric(), s)
+        Ok(take_while(|c| c.is_ascii_alphanumeric(), s))
     } else {
-        (s, "")
+        Err("expected identifier".to_string())
     }
 }
 
@@ -102,18 +106,29 @@ mod tests {
     }
 
     #[test]
+    fn do_not_extract_spaces1_when_input_does_not_start_with_them() {
+        assert_eq!(
+            extract_whitespace1("blah"),
+            Err("expected a space".to_string()),
+        );
+    }
+
+    #[test]
     fn extract_alphabetic_ident() {
-        assert_eq!(extract_ident("abcdEFG stop"), (" stop", "abcdEFG"));
+        assert_eq!(extract_ident("abcdEFG stop"), Ok((" stop", "abcdEFG")));
     }
 
     #[test]
     fn extract_alphanumeric_ident() {
-        assert_eq!(extract_ident("bazbleh13()"), ("()", "bazbleh13"));
+        assert_eq!(extract_ident("bazbleh13()"), Ok(("()", "bazbleh13")));
     }
 
     #[test]
     fn will_not_extract_ident_beginning_with_number() {
-        assert_eq!(extract_ident("123abc"), ("123abc", ""));
+        assert_eq!(
+            extract_ident("123abc"),
+            Err("expected identifier".to_string()),
+        );
     }
 
     #[test]
