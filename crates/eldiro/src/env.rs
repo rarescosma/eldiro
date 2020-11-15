@@ -9,6 +9,24 @@ enum NamedInfo {
     Func { params: Vec<String>, body: Stmt },
 }
 
+impl NamedInfo {
+    fn into_binding(self) -> Option<Val> {
+        if let Self::Binding(val) = self {
+            Some(val)
+        } else {
+            None
+        }
+    }
+
+    fn into_func(self) -> Option<(Vec<String>, Stmt)> {
+        if let Self::Func { params, body } = self {
+            Some((params, body))
+        } else {
+            None
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Default)]
 pub struct Env<'parent> {
     bindings: HashMap<String, NamedInfo>,
@@ -27,14 +45,24 @@ impl<'parent> Env<'parent> {
         self.bindings.insert(name, NamedInfo::Binding(val));
     }
 
+    pub(crate) fn store_func(&mut self, name: String, params: Vec<String>, body: Stmt) {
+        self.bindings.insert(name, NamedInfo::Func { params, body });
+    }
+
     pub(crate) fn get_binding(&self, name: &str) -> Result<Val, String> {
         self.chain_lookup(name)
-            .and_then(|named_info| match named_info {
-                NamedInfo::Binding(val) => Some(val),
-                _ => None,
-            })
+            .and_then(NamedInfo::into_binding)
             .ok_or_else(|| format!(
                 "binding with name '{}' does not exist",
+                name,
+            ))
+    }
+
+    pub(crate) fn get_func(&self, name: &str) -> Result<(Vec<String>, Stmt), String> {
+        self.chain_lookup(name)
+            .and_then(NamedInfo::into_func)
+            .ok_or_else(|| format!(
+                "function with name '{}' does not exist",
                 name,
             ))
     }
