@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 eldiro = {path = "../eldiro"}
+rustyline = "6.3.0"
