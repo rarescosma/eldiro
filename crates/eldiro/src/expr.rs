@@ -264,4 +264,16 @@ mod tests {
             Ok(Val::Number(10)),
         );
     }
+
+    #[test]
+    fn eval_non_number_operation() {
+        assert_eq!(
+            Expr::Operation {
+                lhs: Box::new(Expr::Number(Number(10))),
+                rhs: Box::new(Expr::Block(Block { stmts: Vec::new() })),
+                op: Op::Add,
+            }.eval(&Env::default()),
+            Err("cannot evaluate operation whose left-hand side and right-hand side are not both numbers".to_string()),
+        );
+    }
 }
