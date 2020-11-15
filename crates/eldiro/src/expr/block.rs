@@ -30,7 +30,7 @@ impl Block {
 
         let (tail, heads) = self.stmts.split_last().unwrap();
         for stmt in heads {
-            stmt.eval(&mut child_env);
+            stmt.eval(&mut child_env)?;
         }
         tail.eval(&mut child_env)
     }
