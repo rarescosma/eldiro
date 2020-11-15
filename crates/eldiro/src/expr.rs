@@ -1,5 +1,6 @@
 pub(crate) use binding_usage::BindingUsage;
 pub(crate) use block::Block;
+pub(crate) use func_call::FuncCall;
 
 use crate::env::Env;
 use crate::utils;
@@ -7,6 +8,7 @@ use crate::val::Val;
 
 mod binding_usage;
 mod block;
+mod func_call;
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct Number(pub(crate) i32);
@@ -40,6 +42,7 @@ impl Op {
 pub(crate) enum Expr {
     Number(Number),
     Operation { lhs: Box<Self>, rhs: Box<Self>, op: Op },
+    FuncCall(FuncCall),
     BindingUsage(BindingUsage),
     Block(Block),
 }
@@ -51,10 +54,9 @@ impl Expr {
 
     fn new_non_operation(s: &str) -> Result<(&str, Self), String> {
         Self::new_number(s)
-            .or_else(|_| {
-                BindingUsage::new(s)
-                    .map(|(s, binding_usage)| (s, Self::BindingUsage(binding_usage)))
-            })
+            .or_else(|_| FuncCall::new(s).map(|(s, func_call)| (s, Self::FuncCall(func_call))))
+            .or_else(|_| BindingUsage::new(s)
+                .map(|(s, binding_usage)| (s, Self::BindingUsage(binding_usage))))
             .or_else(|_| Block::new(s).map(|(s, block)| (s, Self::Block(block))))
     }
 
@@ -96,7 +98,8 @@ impl Expr {
                 Ok(Val::Number(result))
             }
             Self::BindingUsage(binding_usage) => binding_usage.eval(env),
-            Self::Block(block) => block.eval(env)
+            Self::Block(block) => block.eval(env),
+            _ => todo!()
         }
     }
 }
@@ -189,6 +192,20 @@ mod tests {
                 "",
                 Expr::Block(Block {
                     stmts: vec![Stmt::Expr(Expr::Number(Number(200)))],
+                }),
+            )),
+        );
+    }
+
+    #[test]
+    fn parse_func_call() {
+        assert_eq!(
+            Expr::new("add 1 2"),
+            Ok((
+                "",
+                Expr::FuncCall(FuncCall {
+                    callee: "add".to_string(),
+                    params: vec![Expr::Number(Number(1)), Expr::Number(Number(2))],
                 }),
             )),
         );
