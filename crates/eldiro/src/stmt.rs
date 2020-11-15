@@ -22,7 +22,7 @@ impl Stmt {
     pub(crate) fn eval(&self, env: &mut Env) -> Result<Val, String> {
         match self {
             Self::BindingDef(bd) => bd.eval(env),
-            Self::FuncDef(_) => todo!(),
+            Self::FuncDef(fd) => fd.eval(env),
             Self::Expr(ex) => ex.eval(env),
         }
     }
@@ -149,6 +149,18 @@ mod tests {
         assert_eq!(
             Stmt::Expr(Expr::Number(Number(5))).eval(&mut Env::default()),
             Ok(Val::Number(5)),
+        );
+    }
+
+    #[test]
+    fn eval_func_def() {
+        assert_eq!(
+            Stmt::FuncDef(FuncDef {
+                name: "always_return_one".to_string(),
+                params: Vec::new(),
+                body: Box::new(Stmt::Expr(Expr::Number(Number(1)))),
+            }).eval(&mut Env::default()),
+            Ok(Val::Unit),
         );
     }
 }

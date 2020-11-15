@@ -1,5 +1,5 @@
 use crate::stmt::Stmt;
-use crate::utils;
+use crate::{utils, Env, Val};
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct FuncDef {
@@ -35,5 +35,14 @@ impl FuncDef {
                 body: Box::new(body),
             }
         ))
+    }
+
+    pub(crate) fn eval(&self, env: &mut Env) -> Result<Val, String> {
+        env.store_func(
+            self.name.clone(),
+            self.params.clone(),
+            *self.body.clone(),
+        );
+        Ok(Val::Unit)
     }
 }
