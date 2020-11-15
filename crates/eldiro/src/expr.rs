@@ -99,7 +99,7 @@ impl Expr {
             }
             Self::BindingUsage(binding_usage) => binding_usage.eval(env),
             Self::Block(block) => block.eval(env),
-            _ => todo!()
+            Self::FuncCall(fn_call) => fn_call.eval(env),
         }
     }
 }
@@ -291,6 +291,33 @@ mod tests {
                 op: Op::Add,
             }.eval(&Env::default()),
             Err("cannot evaluate operation whose left-hand side and right-hand side are not both numbers".to_string()),
+        );
+    }
+
+    #[test]
+    fn eval_func_call() {
+        let mut env = Env::default();
+
+        env.store_func(
+            "add".to_string(),
+            vec!["z".to_string(), "y".to_string()],
+            Stmt::Expr(Expr::Operation {
+                lhs: Box::new(Expr::BindingUsage(BindingUsage {
+                    name: "z".to_string(),
+                })),
+                rhs: Box::new(Expr::BindingUsage(BindingUsage {
+                    name: "y".to_string(),
+                })),
+                op: Op::Add,
+            }),
+        );
+
+        assert_eq!(
+            Expr::FuncCall(FuncCall {
+                callee: "add".to_string(),
+                params: vec![Expr::Number(Number(2)), Expr::Number(Number(2))],
+            }).eval(&env),
+            Ok(Val::Number(4)),
         );
     }
 }
