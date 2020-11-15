@@ -53,7 +53,7 @@ mod tests {
     fn eval_existing_binding_def_usage() {
         let mut env = Env::default();
         let (_, bd) = BindingDef::new("let foo=10").unwrap();
-        bd.eval(&mut env);
+        let _ = bd.eval(&mut env);
 
         assert_eq!(
             BindingUsage {
