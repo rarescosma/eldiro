@@ -1,5 +1,4 @@
 use rustyline::Editor;
-use rustyline::error::ReadlineError;
 
 fn main() {
     let mut rl = Editor::<()>::new();
@@ -21,24 +20,15 @@ fn main() {
                     Ok(None) => {}
                     Err(msg) => println!("{}", msg),
                 }
-            },
-            Err(ReadlineError::Interrupted) => {
-                println!("CTRL-C");
-                break
-            },
-            Err(ReadlineError::Eof) => {
-                println!("CTRL-D");
-                break
-            },
+            }
             Err(err) => {
-                println!("Error: {:?}", err);
-                break
+                println!("{:?}", err);
+                break;
             }
         }
     }
     rl.save_history(history_file).unwrap();
 }
-
 
 
 fn run(input: &str, env: &mut eldiro::Env) -> Result<Option<eldiro::Val>, String> {
