@@ -4,7 +4,7 @@ use crate::expr::Expr;
 use crate::func_def::FuncDef;
 use crate::val::Val;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub(crate) enum Stmt {
     BindingDef(BindingDef),
     FuncDef(FuncDef),
