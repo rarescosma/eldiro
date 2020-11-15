@@ -15,7 +15,7 @@ fn main() {
             Ok(line) => {
                 let line = line.as_str().trim();
                 rl.add_history_entry(line);
-                match run(line, &mut env) {
+                match eval(line, &mut env) {
                     Ok(Some(val)) => println!("{}", val),
                     Ok(None) => {}
                     Err(msg) => println!("{}", msg),
@@ -31,7 +31,7 @@ fn main() {
 }
 
 
-fn run(input: &str, env: &mut eldiro::Env) -> Result<Option<eldiro::Val>, String> {
+fn eval(input: &str, env: &mut eldiro::Env) -> Result<Option<eldiro::Val>, String> {
     let parse = eldiro::parse(input)
         .map_err(|msg| format!("Parse error: {}", msg))?;
 
