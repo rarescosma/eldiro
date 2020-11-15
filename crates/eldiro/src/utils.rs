@@ -12,6 +12,10 @@ pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
     take_while(|c| WHITESPACE.contains(&c), s)
 }
 
+pub(crate) fn extract_non_breaks(s: &str) -> (&str, &str) {
+    take_while(|c| c == ' ', s)
+}
+
 pub(crate) fn extract_whitespace1(s: &str) -> Result<(&str, &str), String> {
     take_while1(|c| WHITESPACE.contains(&c), s, "expected a space".to_string())
 }
@@ -75,12 +79,14 @@ pub(crate) fn tag<'a, 'b>(prefix: &'a str, s: &'b str) -> Result<&'b str, String
 pub(crate) fn sequence<T>(
     parser: impl Fn(&str) -> Result<(&str, T), String>,
     mut s: &str,
+    whitespace_parser: Option<Box<dyn Fn(&str) -> (&str, &str)>>,
 ) -> Result<(&str, Vec<T>), String> {
     let mut items = Vec::new();
+    let whitespace_parser = whitespace_parser.unwrap_or(Box::new(extract_whitespace));
 
     while let Ok((new_s, item)) = parser(s) {
         items.push(item);
-        let (new_s, _) = extract_whitespace(new_s);
+        let (new_s, _) = whitespace_parser(new_s);
         s = new_s;
     }
 
