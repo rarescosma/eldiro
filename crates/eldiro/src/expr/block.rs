@@ -13,13 +13,7 @@ impl Block {
         let s = utils::tag("{", s)?;
         let (s, _) = utils::extract_whitespace(s);
 
-        let mut s = dbg!(s);
-        let mut stmts = Vec::new();
-        while let Ok((new_s, stmt)) = Stmt::new(s) {
-            stmts.push(stmt);
-            let (new_s, _) = utils::extract_whitespace(new_s);
-            s = new_s
-        }
+        let (s, stmts) = utils::sequence(Stmt::new, s)?;
 
         let (s, _) = utils::extract_whitespace(s);
         let s = utils::tag("}", s)?;
