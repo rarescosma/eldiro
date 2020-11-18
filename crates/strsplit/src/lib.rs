@@ -1,14 +1,12 @@
-use std::cell::Cell;
-
 pub struct StrSplit<'a, D> {
-    remainder: Cell<&'a str>,
+    remainder: Option<&'a str>,
     delimiter: D,
 }
 
 impl<'a, D> StrSplit<'a, D> {
     pub fn new(haystack: &'a str, delimiter: D) -> Self {
         Self {
-            remainder: Cell::new(haystack),
+            remainder: Some(haystack),
             delimiter,
         }
     }
@@ -18,17 +16,14 @@ impl<'a, D> Iterator for StrSplit<'a, D> where D: Delimiter {
     type Item = &'a str;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.remainder == Default::default() {
-            return None
-        };
-        let remainder = self.remainder.get();
-        Some(match self.delimiter.find_next(remainder) {
-            Some((start, end)) => {
-                self.remainder.set(&remainder[end..]);
-                &remainder[..start]
-            }
-            None => self.remainder.take()
-        })
+        let remainder = self.remainder.as_mut()?;
+        if let Some((delim_start, delim_end)) = self.delimiter.find_next(remainder) {
+            let item = &remainder[..delim_start];
+            *remainder = &remainder[delim_end..];
+            Some(item)
+        } else {
+            self.remainder.take()
+        }
     }
 }
 
