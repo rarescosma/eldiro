@@ -15,16 +15,19 @@ impl FuncCall {
 
         let (s, param) = Expr::new(s)?;
         let (s, _) = utils::extract_non_breaks(s);
-        let (s, more_params) = utils::sequence(
-            Expr::new,
-            s,
-            Some(Box::new(utils::extract_non_breaks)),
-        )?;
+        let (s, more_params) =
+            utils::sequence(Expr::new, s, Some(Box::new(utils::extract_non_breaks)))?;
 
         let mut params: Vec<Expr> = vec![param];
         params.extend(more_params);
 
-        Ok((s, Self { callee: callee.to_string(), params }))
+        Ok((
+            s,
+            Self {
+                callee: callee.to_string(),
+                params,
+            },
+        ))
     }
 
     pub(super) fn eval(&self, env: &Env) -> Result<Val, String> {
@@ -36,8 +39,7 @@ impl FuncCall {
         if num_expected != num_got {
             return Err(format!(
                 "expected {} parameters, got {}",
-                num_expected,
-                num_got,
+                num_expected, num_got,
             ));
         }
 
@@ -51,10 +53,10 @@ impl FuncCall {
 
 #[cfg(test)]
 mod tests {
+    use super::super::{BindingUsage, Number};
     use super::*;
-    use super::super::{Number, BindingUsage};
-    use crate::stmt::Stmt;
     use crate::expr::Op;
+    use crate::stmt::Stmt;
 
     #[test]
     fn parse_func_call_with_one_parameter() {
@@ -86,7 +88,8 @@ mod tests {
             FuncCall {
                 callee: "id".to_string(),
                 params: vec![Expr::Number(Number(10))],
-            }.eval(&env),
+            }
+            .eval(&env),
             Ok(Val::Number(10)),
         );
     }
@@ -99,7 +102,8 @@ mod tests {
             FuncCall {
                 callee: "i_dont_exist".to_string(),
                 params: vec![Expr::Number(Number(1))],
-            }.eval(&env),
+            }
+            .eval(&env),
             Err("function with name 'i_dont_exist' does not exist".to_string()),
         );
     }
@@ -126,7 +130,8 @@ mod tests {
             FuncCall {
                 callee: "mul".to_string(),
                 params: vec![Expr::Number(Number(100))],
-            }.eval(&env),
+            }
+            .eval(&env),
             Err("expected 2 parameters, got 1".to_string()),
         );
     }
@@ -153,7 +158,8 @@ mod tests {
             FuncCall {
                 callee: "square".to_string(),
                 params: vec![Expr::Number(Number(5)), Expr::Number(Number(42))],
-            }.eval(&env),
+            }
+            .eval(&env),
             Err("expected 1 parameters, got 2".to_string()),
         );
     }

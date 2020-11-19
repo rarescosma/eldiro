@@ -41,7 +41,11 @@ impl Op {
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) enum Expr {
     Number(Number),
-    Operation { lhs: Box<Self>, rhs: Box<Self>, op: Op },
+    Operation {
+        lhs: Box<Self>,
+        rhs: Box<Self>,
+        op: Op,
+    },
     FuncCall(FuncCall),
     BindingUsage(BindingUsage),
     Block(Block),
@@ -55,8 +59,10 @@ impl Expr {
     fn new_non_operation(s: &str) -> Result<(&str, Self), String> {
         Self::new_number(s)
             .or_else(|_| FuncCall::new(s).map(|(s, func_call)| (s, Self::FuncCall(func_call))))
-            .or_else(|_| BindingUsage::new(s)
-                .map(|(s, binding_usage)| (s, Self::BindingUsage(binding_usage))))
+            .or_else(|_| {
+                BindingUsage::new(s)
+                    .map(|(s, binding_usage)| (s, Self::BindingUsage(binding_usage)))
+            })
             .or_else(|_| Block::new(s).map(|(s, block)| (s, Self::Block(block))))
     }
 
@@ -73,7 +79,14 @@ impl Expr {
 
         let (s, rhs) = Self::new_non_operation(s)?;
 
-        Ok((s, Self::Operation { lhs: Box::new(lhs), rhs: Box::new(rhs), op }))
+        Ok((
+            s,
+            Self::Operation {
+                lhs: Box::new(lhs),
+                rhs: Box::new(rhs),
+                op,
+            },
+        ))
     }
 
     pub(crate) fn eval(&self, env: &Env) -> Result<Val, String> {
@@ -218,7 +231,8 @@ mod tests {
                 lhs: Box::new(Expr::Number(Number(10))),
                 rhs: Box::new(Expr::Number(Number(10))),
                 op: Op::Add,
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(20)),
         );
     }
@@ -230,7 +244,8 @@ mod tests {
                 lhs: Box::new(Expr::Number(Number(1))),
                 rhs: Box::new(Expr::Number(Number(5))),
                 op: Op::Sub,
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(-4)),
         );
     }
@@ -242,7 +257,8 @@ mod tests {
                 lhs: Box::new(Expr::Number(Number(5))),
                 rhs: Box::new(Expr::Number(Number(6))),
                 op: Op::Mul,
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(30)),
         );
     }
@@ -254,7 +270,8 @@ mod tests {
                 lhs: Box::new(Expr::Number(Number(200))),
                 rhs: Box::new(Expr::Number(Number(20))),
                 op: Op::Div,
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(10)),
         );
     }
@@ -267,7 +284,8 @@ mod tests {
         assert_eq!(
             Expr::BindingUsage(BindingUsage {
                 name: "ten".to_string(),
-            }).eval(&env),
+            })
+            .eval(&env),
             Ok(Val::Number(10)),
         );
     }
@@ -277,7 +295,8 @@ mod tests {
         assert_eq!(
             Expr::Block(Block {
                 stmts: vec![Stmt::Expr(Expr::Number(Number(10)))],
-            }).eval(&Env::default()),
+            })
+            .eval(&Env::default()),
             Ok(Val::Number(10)),
         );
     }
@@ -316,7 +335,8 @@ mod tests {
             Expr::FuncCall(FuncCall {
                 callee: "add".to_string(),
                 params: vec![Expr::Number(Number(2)), Expr::Number(Number(2))],
-            }).eval(&env),
+            })
+            .eval(&env),
             Ok(Val::Number(4)),
         );
     }

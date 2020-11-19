@@ -3,7 +3,7 @@ use std::fmt;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Val {
     Number(i32),
-    Unit
+    Unit,
 }
 
 impl fmt::Display for Val {

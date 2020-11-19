@@ -33,16 +33,12 @@ impl FuncDef {
                 name: name.to_string(),
                 params,
                 body: Box::new(body),
-            }
+            },
         ))
     }
 
     pub(crate) fn eval(&self, env: &mut Env) -> Result<Val, String> {
-        env.store_func(
-            self.name.clone(),
-            self.params.clone(),
-            *self.body.clone(),
-        );
+        env.store_func(self.name.clone(), self.params.clone(), *self.body.clone());
         Ok(Val::Unit)
     }
 }

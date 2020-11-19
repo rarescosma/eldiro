@@ -1,7 +1,7 @@
 use crate::env::Env;
-use crate::val::Val;
-use crate::utils;
 use crate::expr::FuncCall;
+use crate::utils;
+use crate::val::Val;
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct BindingUsage {
@@ -11,7 +11,12 @@ pub(crate) struct BindingUsage {
 impl BindingUsage {
     pub(super) fn new(s: &str) -> Result<(&str, Self), String> {
         let (s, name) = utils::extract_ident(s)?;
-        Ok((s, Self { name: name.to_string() }))
+        Ok((
+            s,
+            Self {
+                name: name.to_string(),
+            },
+        ))
     }
 
     pub(super) fn eval(&self, env: &Env) -> Result<Val, String> {
@@ -20,7 +25,8 @@ impl BindingUsage {
                 FuncCall {
                     callee: self.name.clone(),
                     params: Vec::new(),
-                }.eval(env)
+                }
+                .eval(env)
             } else {
                 Err(error_msg)
             }
@@ -54,7 +60,8 @@ mod tests {
         assert_eq!(
             BindingUsage {
                 name: "foo".to_string(),
-            }.eval(&env),
+            }
+            .eval(&env),
             Ok(Val::Number(10)),
         );
     }
@@ -68,7 +75,8 @@ mod tests {
         assert_eq!(
             BindingUsage {
                 name: "foo".to_string(),
-            }.eval(&env),
+            }
+            .eval(&env),
             Ok(Val::Number(10)),
         );
     }
@@ -80,7 +88,8 @@ mod tests {
         assert_eq!(
             BindingUsage {
                 name: "i_dont_exist".to_string(),
-            }.eval(&empty_env),
+            }
+            .eval(&empty_env),
             Err("binding with name 'i_dont_exist' does not exist".to_string()),
         );
     }

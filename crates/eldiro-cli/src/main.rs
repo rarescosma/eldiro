@@ -30,10 +30,8 @@ fn main() {
     rl.save_history(history_file).unwrap();
 }
 
-
 fn eval(input: &str, env: &mut eldiro::Env) -> Result<Option<eldiro::Val>, String> {
-    let parse = eldiro::parse(input)
-        .map_err(|msg| format!("Parse error: {}", msg))?;
+    let parse = eldiro::parse(input).map_err(|msg| format!("Parse error: {}", msg))?;
 
     let evaluated = parse
         .eval(env)

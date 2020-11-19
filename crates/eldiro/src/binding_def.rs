@@ -22,7 +22,13 @@ impl BindingDef {
 
         let (s, val) = Expr::new(s)?;
 
-        Ok((s, Self { name: name.to_string(), val }))
+        Ok((
+            s,
+            Self {
+                name: name.to_string(),
+                val,
+            },
+        ))
     }
 
     pub(crate) fn eval(&self, env: &mut Env) -> Result<Val, String> {

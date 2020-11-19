@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use crate::val::Val;
 use crate::stmt::Stmt;
+use crate::val::Val;
 
 #[derive(Debug, PartialEq, Clone)]
 enum NamedInfo {
@@ -52,26 +52,19 @@ impl<'parent> Env<'parent> {
     pub(crate) fn get_binding(&self, name: &str) -> Result<Val, String> {
         self.chain_lookup(name)
             .and_then(NamedInfo::into_binding)
-            .ok_or_else(|| format!(
-                "binding with name '{}' does not exist",
-                name,
-            ))
+            .ok_or_else(|| format!("binding with name '{}' does not exist", name,))
     }
 
     pub(crate) fn get_func(&self, name: &str) -> Result<(Vec<String>, Stmt), String> {
         self.chain_lookup(name)
             .and_then(NamedInfo::into_func)
-            .ok_or_else(|| format!(
-                "function with name '{}' does not exist",
-                name,
-            ))
+            .ok_or_else(|| format!("function with name '{}' does not exist", name,))
     }
 
     fn chain_lookup(&self, name: &str) -> Option<NamedInfo> {
-        self.bindings.get(name).cloned().or_else(|| {
-            self.parent.and_then(|parent| parent.chain_lookup(name))
-        })
+        self.bindings
+            .get(name)
+            .cloned()
+            .or_else(|| self.parent.and_then(|parent| parent.chain_lookup(name)))
     }
 }
-
-

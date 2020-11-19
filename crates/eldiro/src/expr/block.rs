@@ -5,7 +5,7 @@ use crate::val::Val;
 
 #[derive(Debug, PartialEq, Clone)]
 pub(crate) struct Block {
-    pub(crate) stmts: Vec<Stmt>
+    pub(crate) stmts: Vec<Stmt>,
 }
 
 impl Block {
@@ -23,7 +23,7 @@ impl Block {
 
     pub(super) fn eval(&self, env: &Env) -> Result<Val, String> {
         if self.stmts.is_empty() {
-            return Ok(Val::Unit)
+            return Ok(Val::Unit);
         }
 
         let mut child_env = env.create_child();
@@ -40,8 +40,8 @@ impl Block {
 mod tests {
     use crate::binding_def::BindingDef;
 
-    use super::*;
     use super::super::{BindingUsage, Expr, Number, Op};
+    use super::*;
 
     #[test]
     fn parse_empty_block() {
@@ -86,9 +86,13 @@ mod tests {
                         }),
                         Stmt::BindingDef(BindingDef {
                             name: "b".to_string(),
-                            val: Expr::BindingUsage(BindingUsage { name: "a".to_string() }),
+                            val: Expr::BindingUsage(BindingUsage {
+                                name: "a".to_string()
+                            }),
                         }),
-                        Stmt::Expr(Expr::BindingUsage(BindingUsage { name: "b".to_string() })),
+                        Stmt::Expr(Expr::BindingUsage(BindingUsage {
+                            name: "b".to_string()
+                        })),
                     ],
                 },
             )),
@@ -108,7 +112,8 @@ mod tests {
         assert_eq!(
             Block {
                 stmts: vec![Stmt::Expr(Expr::Number(Number(25)))],
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(25)),
         );
     }
@@ -126,7 +131,8 @@ mod tests {
                         name: "one".to_string(),
                     })),
                 ],
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(1)),
         );
     }
@@ -149,7 +155,8 @@ mod tests {
                         val: Expr::Number(Number(3)),
                     }),
                 ],
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Unit),
         );
     }
@@ -167,7 +174,8 @@ mod tests {
                         op: Op::Sub,
                     }),
                 ],
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(3)),
         );
     }
@@ -190,7 +198,8 @@ mod tests {
                         name: "baz".to_string(),
                     })),
                 ],
-            }.eval(&env),
+            }
+            .eval(&env),
             Ok(Val::Number(2)),
         );
     }
@@ -205,18 +214,17 @@ mod tests {
                         val: Expr::Number(Number(17)),
                     }),
                     Stmt::Expr(Expr::Block(Block {
-                        stmts: vec![
-                            Stmt::BindingDef(BindingDef {
-                                name: "foo".to_string(),
-                                val: Expr::Number(Number(42)),
-                            }),
-                        ]
+                        stmts: vec![Stmt::BindingDef(BindingDef {
+                            name: "foo".to_string(),
+                            val: Expr::Number(Number(42)),
+                        }),]
                     })),
                     Stmt::Expr(Expr::BindingUsage(BindingUsage {
                         name: "foo".to_string()
                     }))
                 ]
-            }.eval(&Env::default()),
+            }
+            .eval(&Env::default()),
             Ok(Val::Number(17))
         );
     }

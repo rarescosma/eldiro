@@ -30,7 +30,7 @@ impl Stmt {
 
 #[cfg(test)]
 mod tests {
-    use crate::expr::{Number, Op, BindingUsage, Block};
+    use crate::expr::{BindingUsage, Block, Number, Op};
 
     use super::*;
 
@@ -139,7 +139,8 @@ mod tests {
             Stmt::BindingDef(BindingDef {
                 name: "whatever".to_string(),
                 val: Expr::Number(Number(-10)),
-            }).eval(&mut Env::default()),
+            })
+            .eval(&mut Env::default()),
             Ok(Val::Unit),
         );
     }
@@ -159,7 +160,8 @@ mod tests {
                 name: "always_return_one".to_string(),
                 params: Vec::new(),
                 body: Box::new(Stmt::Expr(Expr::Number(Number(1)))),
-            }).eval(&mut Env::default()),
+            })
+            .eval(&mut Env::default()),
             Ok(Val::Unit),
         );
     }

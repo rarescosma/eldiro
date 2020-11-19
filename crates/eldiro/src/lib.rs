@@ -18,7 +18,6 @@ impl Parse {
     }
 }
 
-
 pub fn parse(s: &str) -> Result<Parse, String> {
     let (s, stmt) = stmt::Stmt::new(s)?;
 

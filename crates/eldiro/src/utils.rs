@@ -1,11 +1,7 @@
 const WHITESPACE: &[char] = &[' ', '\n'];
 
 pub(crate) fn extract_digits(s: &str) -> Result<(&str, &str), String> {
-    take_while1(
-        |c| c.is_ascii_digit(),
-        s,
-        "expected digits".to_string(),
-    )
+    take_while1(|c| c.is_ascii_digit(), s, "expected digits".to_string())
 }
 
 pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
@@ -17,7 +13,11 @@ pub(crate) fn extract_non_breaks(s: &str) -> (&str, &str) {
 }
 
 pub(crate) fn extract_whitespace1(s: &str) -> Result<(&str, &str), String> {
-    take_while1(|c| WHITESPACE.contains(&c), s, "expected a space".to_string())
+    take_while1(
+        |c| WHITESPACE.contains(&c),
+        s,
+        "expected a space".to_string(),
+    )
 }
 
 pub(crate) fn extract_ident(s: &str) -> Result<(&str, &str), String> {
@@ -37,9 +37,7 @@ pub(crate) fn extract_ident(s: &str) -> Result<(&str, &str), String> {
 fn take_while(accept: impl Fn(char) -> bool, s: &str) -> (&str, &str) {
     let take_end = s
         .char_indices()
-        .find_map(
-            |(idx, c)| if accept(c) { None } else { Some(idx) }
-        )
+        .find_map(|(idx, c)| if accept(c) { None } else { Some(idx) })
         .unwrap_or_else(|| s.len());
     (&s[take_end..], &s[..take_end])
 }
@@ -99,18 +97,12 @@ mod tests {
 
     #[test]
     fn extract_one_digit() {
-        assert_eq!(
-            extract_digits("1+2"),
-            Ok(("+2", "1"))
-        );
+        assert_eq!(extract_digits("1+2"), Ok(("+2", "1")));
     }
 
     #[test]
     fn extract_multiple_digits() {
-        assert_eq!(
-            extract_digits("10-20"),
-            Ok(("-20", "10"))
-        );
+        assert_eq!(extract_digits("10-20"), Ok(("-20", "10")));
     }
 
     #[test]

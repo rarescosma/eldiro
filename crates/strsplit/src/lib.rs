@@ -12,7 +12,10 @@ impl<'a, D> StrSplit<'a, D> {
     }
 }
 
-impl<'a, D> Iterator for StrSplit<'a, D> where D: Delimiter {
+impl<'a, D> Iterator for StrSplit<'a, D>
+where
+    D: Delimiter,
+{
     type Item = &'a str;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -45,24 +48,19 @@ impl Delimiter for char {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::*;
 
     #[test]
     fn it_works_with_str_delimiter() {
-        let res: Vec<_> = StrSplit::new(
-            "a b c", " ",
-        ).collect();
+        let res: Vec<_> = StrSplit::new("a b c", " ").collect();
         assert_eq!(res, vec!["a", "b", "c"]);
     }
 
     #[test]
     fn it_works_with_char_delimiter() {
-        let res: Vec<_> = StrSplit::new(
-            "hello world", 'o',
-        ).collect();
+        let res: Vec<_> = StrSplit::new("hello world", 'o').collect();
         assert_eq!(res, vec!["hell", " w", "rld"]);
     }
 }
