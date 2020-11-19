@@ -1,6 +1,18 @@
+use std::collections::HashMap;
 use std::io;
+use std::net::Ipv4Addr;
+
+mod tcp;
+
+#[derive(Clone, Hash, Eq, PartialEq)]
+struct Quad {
+    src: (Ipv4Addr, u16),
+    dst: (Ipv4Addr, u16),
+}
 
 fn main() -> io::Result<()> {
+    let mut connections: HashMap<Quad, tcp::State> = Default::default();
+
     let nic = tun_tap::Iface::new("tun0", tun_tap::Mode::Tun)?;
     let mut buf = [0u8; 1504];
     loop {
@@ -14,24 +26,26 @@ fn main() -> io::Result<()> {
         }
 
         match etherparse::Ipv4HeaderSlice::from_slice(&buf[4..nbytes]) {
-            Ok(p) => {
-                let src = p.source_addr();
-                let dst = p.destination_addr();
-                let proto = p.protocol();
+            Ok(iph) => {
+                let src = iph.source_addr();
+                let dst = iph.destination_addr();
+                let proto = iph.protocol();
                 if proto != 0x06 {
                     // only tcp
                     continue;
                 }
 
-                match etherparse::TcpHeaderSlice::from_slice(&buf[4 + p.slice().len()..]) {
-                    Ok(p) => {
-                        eprintln!(
-                            "{} -> {} {}b of tcp to port {}",
-                            src,
-                            dst,
-                            p.slice().len(),
-                            p.destination_port(),
-                        );
+                match etherparse::TcpHeaderSlice::from_slice(&buf[4 + iph.slice().len()..]) {
+                    Ok(tcph) => {
+                        let data_index = 4 + iph.slice().len() + tcph.slice().len();
+                        connections
+                            .entry(Quad {
+                                src: (src, tcph.source_port()),
+                                dst: (dst, tcph.destination_port()),
+                            })
+                            .or_default()
+                            .on_packet(iph, tcph, &buf[data_index..]);
+
                     }
                     Err(e) => eprintln!("ignoring weird packet {:?}", e),
                 }
