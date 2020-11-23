@@ -1,3 +1,37 @@
+/// This one illustrates timelines and traits
+/// as well as the use of options and slices:
+///
+/// Our simple Iterator implementation is generic over a type D
+/// with a trait bound of "Delimiter", which means types that want
+/// to work with our iterator need to implement "Delimiter", in other words:
+/// the *only* thing we require of D is its ability to find a "something"
+/// within itself, expressed by the signature of `find_next`:
+///
+/// ```
+/// pub trait Delimiter {
+///   fn find_next(&self, s: &str) -> Option<(usize, usize)>;
+/// }
+/// ```
+///
+/// It also illustrates some of the APIs over `Option` and `Result`.
+///
+/// For `Result`, if you have a function that returns it, and you make calls
+/// to other function that return `Result` (by say, an assignment), you can
+/// use the `?` suffix to short-circuit the return, if the inner function
+/// failed. No more `if` for error handling, yay!
+///
+/// `Option` can be deconstructed straight by assignments:
+///
+/// ```
+/// fn bar() -> Option<Foo> {}
+///
+/// fn foo() {
+///   if let Some(foo) = bar() {
+///     // will be reached when the Option was Some
+///   }
+/// }
+/// ```
+
 pub struct StrSplit<'a, D> {
     remainder: Option<&'a str>,
     delimiter: D,
