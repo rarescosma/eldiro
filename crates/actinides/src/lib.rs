@@ -100,6 +100,7 @@ impl<T> Deref for WriteHandle<T> {
 impl<T> Drop for WriteHandle<T> {
     fn drop(&mut self) {
         if self._refcount.fetch_sub(1, Ordering::Release) == 1 {
+            // Wrap the raw pointer in a Box and immediately drop it!
             let _ = unsafe { Box::from_raw(self.t.as_ptr()) };
         }
     }
