@@ -19,7 +19,7 @@ pub struct WriteGuard<'wg, T> {
 impl<T> Deref for WriteGuard<'_, T> {
     type Target = T;
     fn deref(&self) -> &Self::Target {
-        self.handle.deref()
+        &*self.t
     }
 }
 
