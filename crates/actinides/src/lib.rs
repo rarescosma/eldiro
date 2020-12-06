@@ -80,8 +80,8 @@ impl<T> Clone for WriteHandle<T> {
         self._refcount.fetch_add(1, Ordering::Acquire);
         Self {
             t: self.t,
-            _writing: Arc::clone(&self._writing),
-            _refcount: Arc::clone(&self._refcount),
+            _writing: self._writing.clone(),
+            _refcount: self._refcount.clone(),
             _marker: PhantomData,
         }
     }
