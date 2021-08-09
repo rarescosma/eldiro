@@ -23,10 +23,12 @@
 /// `Option` can be deconstructed straight by assignments:
 ///
 /// ```
-/// fn bar() -> Option<Foo> {}
+/// fn bar<Foo>() -> Option<Foo> {
+///     None
+/// }
 ///
 /// fn foo() {
-///   if let Some(foo) = bar() {
+///   if let Some(foo) = bar::<i32>() {
 ///     // will be reached when the Option was Some
 ///   }
 /// }

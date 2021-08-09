@@ -55,7 +55,13 @@ impl<T> WriteHandle<T> {
     fn lock(&self) {
         let mut i = 0;
         loop {
-            if self._writing.compare_and_swap(false, true, Ordering::Acquire) == false {
+            if self._writing.compare_exchange_weak(
+                false,
+                true,
+                Ordering::Acquire,
+                Ordering::Acquire,
+            ) == Ok(false)
+            {
                 return;
             };
             if i == YIELD_AFTER {

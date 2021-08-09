@@ -122,8 +122,8 @@ impl Connection {
 
     pub fn on_packet(
         &mut self,
-        nic: &mut tun_tap::Iface,
-        iph: etherparse::Ipv4HeaderSlice,
+        _nic: &mut tun_tap::Iface,
+        _iph: etherparse::Ipv4HeaderSlice,
         tcph: etherparse::TcpHeaderSlice,
         data: &[u8],
     ) -> io::Result<()> {
@@ -243,8 +243,8 @@ mod tests {
         case_eq_c: (u32::max_value().wrapping_add(1), 2, 2, true),
         all_eq: (u32::max_value(), u32::max_value(), u32::max_value(), false),
         no_wrap: (5, 18, 23, true),
-        x_e_wrapped: (50, u32::max_value().wrapping_add(18), u32::max_value().wrapping_add(23), true),
-        e_wrapped: (5, 18, u32::max_value().wrapping_add(2), true),
+        x_e_wrapped: (50, u32::max_value().wrapping_add(18), u32::max_value().wrapping_add(23), false),
+        e_wrapped: (5, 18, u32::max_value().wrapping_add(2), false),
         start_wrapped: (3, 2, 1, false),
         no_bound_wrap_x_left: (2, 1, 3, false),
         no_bound_wrap_x_right: (1, 3, 2, false),
