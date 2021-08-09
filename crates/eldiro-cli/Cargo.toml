@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 eldiro = {path = "../eldiro"}
 strsplit = {path = "../strsplit"}
-rustyline = "6.3.0"
+rustyline = "8.2.0"
