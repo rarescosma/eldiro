@@ -47,7 +47,7 @@ impl Connection {
         nic: &mut tun_tap::Iface,
         iph: etherparse::Ipv4HeaderSlice,
         tcph: etherparse::TcpHeaderSlice,
-        data: &[u8],
+        _data: &[u8],
     ) -> io::Result<Option<Self>> {
         let mut buf = [0u8; 1500];
 

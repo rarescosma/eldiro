@@ -52,7 +52,7 @@ fn main() -> io::Result<()> {
                                     &buf[data_index..nbytes],
                                 );
                             }
-                            Entry::Vacant(mut e) => {
+                            Entry::Vacant(e) => {
                                 if let Some(c) = tcp::Connection::accept(
                                     &mut nic,
                                     iph,
