@@ -3,23 +3,24 @@
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
+use std::ptr::NonNull;
 
 pub struct Boks<T> {
-    p: *mut T,
+    p: NonNull<T>,
     _p: PhantomData<T>,
 }
 
 unsafe impl<#[may_dangle] T> Drop for Boks<T> {
     fn drop(&mut self) {
         // This will construct a `Box` from the raw pointer and immediately drop it.
-        unsafe { Box::from_raw(self.p) };
+        unsafe { Box::from_raw(self.p.as_ptr()) };
     }
 }
 
 impl<T> Boks<T> {
     pub fn ny(t: T) -> Self {
         Boks {
-            p: Box::into_raw(Box::new(t)),
+            p: unsafe { NonNull::new_unchecked(Box::into_raw(Box::new(t))) },
             _p: PhantomData,
         }
     }
@@ -32,7 +33,7 @@ impl<T> Deref for Boks<T> {
     // through Box (which creates aligned non-null pointers), and hasn't been freed, since
     // self itself is alive.
     fn deref(&self) -> &Self::Target {
-        unsafe { &*self.p }
+        unsafe { self.p.as_ref() }
     }
 }
 
@@ -45,7 +46,7 @@ impl<T> DerefMut for Boks<T> {
     // self itself is alive.
     // Also, since we have `&mut self`, no other mutable reference to `p` has been given out.
     fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { &mut *self.p }
+        unsafe { self.p.as_mut() }
     }
 }
 
@@ -73,8 +74,8 @@ fn main() {
     let _b3 = Boks::ny(Oisann(&mut z));
     println!("{:?}", z);
 
-    // let s = String::from("hei");
-    // let mut _b4 = Boks::ny(&*s);
-    // let b5: Boks<&'static str> = Boks::ny("heisann");
-    // _b4 = b5;
+    let s = String::from("hei");
+    let mut _b4 = Boks::ny(&*s);
+    let b5: Boks<&'static str> = Boks::ny("heisann");
+    _b4 = b5;
 }
