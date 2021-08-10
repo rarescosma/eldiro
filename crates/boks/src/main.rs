@@ -52,6 +52,10 @@ impl<T> DerefMut for Boks<T> {
 
 struct Oisann<T: Debug>(T);
 
+// This would break example 3 because the drop implementation will
+// prevent the compiler from shortening the lifetime of the mutable borrow
+// before the `println!` statement.
+
 // impl<T> Drop for Oisann<T>
 // where
 //     T: Debug,
@@ -60,6 +64,13 @@ struct Oisann<T: Debug>(T);
 //         println!("{:?}", self.0)
 //     }
 // }
+
+// To make a type that's generic _and_ covariant over <T>
+// but that doesn't trigger the drop-check for <T> use this construct:
+#[derive(Default)]
+struct Deserializer<T> {
+    _t: PhantomData<fn() -> T>,
+}
 
 fn main() {
     let x = 42;
@@ -70,12 +81,16 @@ fn main() {
     let _b2 = Boks::ny(&mut y);
     println!("{:?}", y);
 
+    // Example 3
     let mut z = 42;
     let _b3 = Boks::ny(Oisann(&mut z));
     println!("{:?}", z);
 
+    // This would not compile if we were invariant in the type T
     let s = String::from("hei");
     let mut _b4 = Boks::ny(&*s);
     let b5: Boks<&'static str> = Boks::ny("heisann");
     _b4 = b5;
+
+    let _d = Deserializer::<u8>::default();
 }
